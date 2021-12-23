@@ -1,6 +1,6 @@
 # Generate Sysimage
 
-To build a custom sysimage, do the following:
+To build a custom Julia sysimage, do the following:
 
 1. Navigate to this project's root directory.
 

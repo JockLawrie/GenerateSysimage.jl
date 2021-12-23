@@ -1,0 +1,10 @@
+name = "GenerateSysimage"
+uuid = "3d84cf99-64ca-41cd-a21c-d696b770f880"
+authors = ["jocklawrie <jock.lawrie@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
+Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
+PackageCompiler = "9b87118b-4619-50d2-8e1e-99f35a4d4d9d"
+Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"

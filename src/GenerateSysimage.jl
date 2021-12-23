@@ -12,24 +12,17 @@ using Logging
 function generate_sysimage(packagelist::Vector{String}, sysimage_name::String, precompile_script)
     @info "$(now()) Start"
     @info "$(now()) Checking inputs"
-    !isnothing(precompile_script) && !isfile(precompile_script) && precompile_script != "usetests" && error("The precompile script is unrecognised")
+    precompile_script = check_precompile_script(precompile_script)
 
     @info "$(now()) Determining the path of the resulting sysimage"
     outdir = joinpath(pwd(), "output")
     !isdir(outdir) && mkdir(outdir)
     result_fullpath = joinpath(outdir, sysimage_name)
 
-    @info "$(now()) Adding the packages in the package list"
-    for p in packagelist
-        Pkg.add(p)
-    end
+    @info "$(now()) Generating temporary package"
+    temppkg_dir = generate_temppkg(packagelist)
 
-    if precompile_script == "usetests"
-        @info "$(now()) Auto-generating precompile script"
-        precompile_script = generate_precompile_file(packagelist, outdir, sysimage_name)
-    end
-
-    @info "$(now()) Creating sysimage"
+    @info "$(now()) Creating sysimage from temporary package"
     if isnothing(precompile_script)
         create_sysimage(packagelist; sysimage_path=result_fullpath)
     else
@@ -37,12 +30,35 @@ function generate_sysimage(packagelist::Vector{String}, sysimage_name::String, p
     end
     @info "$(now()) Done. The new sysimage is at: $(result_fullpath)"
 
-    @info "$(now()) Removing packages (ensures that the next sysimage has the latest versions)"
-    for p in packagelist
-        in(p, packages_to_retain) && continue
-        Pkg.rm(p)
-    end
+    @info "$(now()) Removing temporary package"
+    cd(@__DIR__)
+    rm(temppkg_dir; recursive=true)
+
     @info "$(now()) Finished"
+end
+
+################################################################################
+
+function check_precompile_script(precompile_script)
+    if isnothing(precompile_script) || isfile(precompile_script)
+        return precompile_script
+    elseif precompile_script == "usetests"
+        @info "$(now()) Auto-generating precompile script"
+        return generate_precompile_file(packagelist, outdir, sysimage_name)
+    else
+        error("The precompile script is unrecognised")
+    end
+end
+
+function generate_temppkg(packagelist)
+    cd(tempdir())
+    Pkg.generate("temppkg")
+    cd("temppkg")
+    Pkg.activate(".")
+    for p in packagelist
+        Pkg.add(p)
+    end
+    pwd()
 end
 
 function generate_precompile_file(packagelist, outdir, sysimage_name)
@@ -56,6 +72,5 @@ function generate_precompile_file(packagelist, outdir, sysimage_name)
     end
     precompile_file
 end
-
 
 end

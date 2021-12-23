@@ -9,10 +9,10 @@ using Pkg
 using PackageCompiler
 using Logging
 
-function generate_sysimage(packagelist::Vector{String}, sysimage_name::String, precompile_script=nothing)
+function generate_sysimage(packagelist::Vector{String}, sysimage_name::String, precompile_script)
     @info "$(now()) Start"
     @info "$(now()) Checking inputs"
-    !isnothing(precompile_script) && !isfile(precompile_script) && error("The precompile script is not a file")
+    !isnothing(precompile_script) && !isfile(precompile_script) && precompile_script != "usetests" && error("The precompile script is unrecognised")
 
     @info "$(now()) Determining the path of the resulting sysimage"
     outdir = joinpath(pwd(), "output")
@@ -22,6 +22,11 @@ function generate_sysimage(packagelist::Vector{String}, sysimage_name::String, p
     @info "$(now()) Adding the packages in the package list"
     for p in packagelist
         Pkg.add(p)
+    end
+
+    if precompile_script == "usetests"
+        @info "$(now()) Auto-generating precompile script"
+        precompile_script = generate_precompile_file(packagelist, outdir, sysimage_name)
     end
 
     @info "$(now()) Creating sysimage"
@@ -38,6 +43,18 @@ function generate_sysimage(packagelist::Vector{String}, sysimage_name::String, p
         Pkg.rm(p)
     end
     @info "$(now()) Finished"
+end
+
+function generate_precompile_file(packagelist, outdir, sysimage_name)
+    imagename, ext  = splitext(sysimage_name)
+    precompile_file = joinpath(outdir, "$(imagename).jl")
+    open(precompile_file, "w") do f
+        for p in packagelist
+            write(f, "using $(p)\n")
+            write(f, "include(joinpath(pkgdir($(p)), \"test\", \"runtests.jl\"))\n")
+        end
+    end
+    precompile_file
 end
 
 

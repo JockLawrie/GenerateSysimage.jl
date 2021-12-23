@@ -4,7 +4,7 @@ To build a custom Julia sysimage, do the following:
 
 1. Navigate to this project's root directory.
 
-2. Open `scripts/generate_sysimage.jl` and configure the `sysimage_name` and `packagelist` inputs as desired.
+2. Open `scripts/generate_sysimage.jl` and configure the `sysimage_name`, `packagelist` and `precompile_script` inputs as desired.
 
 3. Run the script from the command line as follows:  julia scripts/generate_sysimage.jl
 

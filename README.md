@@ -12,5 +12,5 @@ To use the new sysimage, start Julia from the command line with the sysimage fla
 For example:
 
 ```
-julia --sysimage=/path/to/GenerateSysimage.jl/output/TestSysimage1.so
+julia --sysimage=/path/to/GenerateSysimage.jl/output/TestSysimage.so
 ```

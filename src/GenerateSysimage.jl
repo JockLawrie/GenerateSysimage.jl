@@ -2,12 +2,10 @@ module GenerateSysimage
 
 export generate_sysimage
 
-const packages_to_retain = Set(["Dates", "Logging", "PackageCompiler", "Pkg"])
-
 using Dates
-using Pkg
-using PackageCompiler
 using Logging
+using PackageCompiler
+using Pkg
 using TOML
 
 function generate_sysimage(packagelist::Vector{String}, sysimage_name::String, precompile_script)
@@ -77,7 +75,7 @@ function generate_precompile_script(packagelist, sysimage_name, outdir, tempproj
     extrapackages  = construct_extrapackages(packagelist, pkgname2pkgdir)
     add_packages_to_tempproject!(tempproject_dir, extrapackages)
     append_package_imports_to_precompilescript!(precompile_script, extrapackages)
-    append_tests_to_precompilescript!(precompile_script, packagelist)
+    append_tests_to_precompilescript!(precompile_script, packagelist, pkgname2pkgdir)
 end
 
 function init_precompilescript(sysimage_name, outdir)
@@ -107,8 +105,8 @@ function construct_extrapackages(packagelist, pkgname2pkgdir)
     result = Set{String}()
     packages_done = Set(packagelist)
     for pkgname in packagelist
-        packagedir     = pkgname2pkgdir[pkgname]
-        extra_packages = get_extra_packages(result, packagedir)
+        packagedir    = pkgname2pkgdir[pkgname]
+        extrapackages = get_extra_packages(result, packagedir)
         for p in extrapackages
             in(p, packages_done) && continue
             push!(result, p)

@@ -30,5 +30,5 @@ julia --sysimage=GenerateSysimage.jl/output/TestSysimage.so
 This package:
 
 1. Generates a temporary project with the list of supplied packages as dependencies.
-2. Creates a sysimage from the temporary package and stores it in the `GenerateSysimage.jl/output` directory.
-3. Deletes the temporary package.
+2. Creates a sysimage from the temporary project and stores it in the `GenerateSysimage.jl/output` directory.
+3. Deletes the temporary project.

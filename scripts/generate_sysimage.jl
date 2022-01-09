@@ -1,9 +1,13 @@
-sysimage_name     = "TestSysimage.so"
-packagelist       = ["DataFrames"]
+
+output_directory  = "C:/data"
+packagelist       = ["CategoricalArrays", "CSV", "DataFrames", "Dates", "Distributions", "GLM", "JSON3", "Logging",
+                     "MLJLinearModels", "MultinomialRegression", "ODBC", "Optim", "Random", "Statistics", "Tables",
+                     "TOML", "UUIDs"]
+sysimage_name     = nothing
 precompile_script = nothing
 
 using Pkg
 Pkg.activate(".")
 using GenerateSysimage
 
-generate_sysimage(packagelist, sysimage_name, precompile_script)
+GenerateSysimage.generate_content(output_directory, packagelist, sysimage_name, precompile_script)

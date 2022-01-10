@@ -9,6 +9,7 @@ To build a clean depot of packages and optionally a custom Julia sysimage, do th
    The input parameters are:
    - `output_directory`. The full path of the directory in which output will be stored.
    - `packagelist::Vector{String}`. List of package names to be included in the new depot and (optional) sysimage.
+   - `remove_precompiled`. If true, remove the `compiled` directory from the new depot.
    - `sysimage_name`. One of:
 
        - `nothing`. A custom sysimage will not be built.

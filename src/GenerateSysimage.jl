@@ -10,7 +10,8 @@ using TOML
 Generate a depot containing the packages in the supplied package list.
 If sysimage_name is not nothing, then also generate a sysimage.
 """
-function generate_content(outdir::String, packagelist::Vector{String}, sysimage_name::Union{Nothing, String}, precompile_script)
+function generate_content(outdir::String, packagelist::Vector{String}, remove_precompiled::Bool,
+                          sysimage_name::Union{Nothing, String}, precompile_script)
     @info "$(now()) Start"
 
     @info "$(now()) Checking inputs"
@@ -19,15 +20,14 @@ function generate_content(outdir::String, packagelist::Vector{String}, sysimage_
     end
 
     @info "$(now()) Creating output directory"
-    output_type = isnothing(sysimage_name) ? "depot" : "sysimage"
     !isdir(outdir) && mkdir(outdir)
-    outdir = abspath(joinpath(outdir, "$(output_type)-$(format_date_for_dirname(now()))"))
+    output_type = isnothing(sysimage_name) ? "depot" : "sysimage"
+    outdir      = abspath(joinpath(outdir, "$(output_type)-$(format_date_for_dirname(now()))"))
     !isdir(outdir) && mkdir(outdir)
     @info "$(now()) Output directory is: $(outdir)"
 
-    @info "$(now()) Initiating new depot"
+    @info "$(now()) Initiating new depot at $(joinpath(outdir, ".julia"))"
     newdepot = create_new_depot(outdir)  # Fresh depot to be used by the temporary project
-    @info "$(now()) New depot initiated at: $(newdepot)"
     
     @info "$(now()) Generating temporary project"
     tempproject_dir = generate_tempproject(packagelist)  # pwd() is now set to tempproject_dir
@@ -35,11 +35,16 @@ function generate_content(outdir::String, packagelist::Vector{String}, sysimage_
 
     !isnothing(sysimage_name) && generate_sysimage(packagelist, sysimage_name, precompile_script, outdir, newdepot, tempproject_dir)
 
+    if remove_precompiled
+        @info "$(now()) Removing the 'compiled' directory from the new depot"
+        rm(joinpath(newdepot, "compiled"); recursive=true)
+    end
+
     @info "$(now()) Removing temporary project"
     cd(@__DIR__)
     rm(tempproject_dir; recursive=true)
 
-    @info "$(now()) Finished"
+    @info "$(now()) Finished. Output is stored at: $(outdir)"
 end
 
 ################################################################################

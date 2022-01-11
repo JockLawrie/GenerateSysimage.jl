@@ -1,15 +1,14 @@
 # Generate Sysimage
 
-To build a clean depot of packages and optionally a custom Julia sysimage, do the following:
+Follow these steps to build a clean depot of packages and optionally a custom Julia system image.
 
 1. Navigate to this project's root directory.
 
-2. Open `scripts/generate_sysimage.jl` and configure the input parameters as required.
+2. Open `scripts/generate_sysimage.jl` and configure the following input parameters as required:
 
-   The input parameters are:
    - `output_directory`. The full path of the directory in which output will be stored.
    - `packagelist::Vector{String}`. List of package names to be included in the new depot and (optional) sysimage.
-   - `remove_precompiled`. If true, remove the `compiled` directory from the new depot.
+   - `remove_precompiled`. If true, remove the `compiled` directory from the new depot. Useful for minimising the size of the resulting depot for the purpose of copying it between machines.
    - `sysimage_name`. One of:
 
        - `nothing`. A custom sysimage will not be built.
